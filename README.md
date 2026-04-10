@@ -26,6 +26,7 @@ This system manages employees within a tech company. Each employee maintains a l
     * **Abstract Classes & Interfaces:** Used to define the base `Employee` template and enforce role-specific skill implementations.
     * **Dynamic Data Structures:** Utilizes Java Collections (e.g., `HashMap`) for $O(1)$ runtime lookups and efficient in-memory state management.
     * **Enums:** Type-safe representation of cooperation levels.
+<img width="1440" height="1524" alt="image" src="https://github.com/user-attachments/assets/3592cff0-0fc9-4606-9843-0fe8dde5e4e5" />
 
 ## ⚙️ Getting Started
 
