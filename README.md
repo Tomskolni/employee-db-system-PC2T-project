@@ -28,6 +28,24 @@ This system manages employees within a tech company. Each employee maintains a l
     * **Enums:** Type-safe representation of cooperation levels.
 <img width="1440" height="1524" alt="image" src="https://github.com/user-attachments/assets/3592cff0-0fc9-4606-9843-0fe8dde5e4e5" />
 
+Project structure
+src/
+├── model/
+│   ├── CoopLevel.java          // enum: POOR, AVERAGE, GOOD
+│   ├── Collaborator.java       // holds Employee ref + CoopLevel
+│   ├── Employee.java           // abstract base class
+│   ├── DataAnalyst.java        // extends Employee
+│   └── SecuritySpecialist.java // extends Employee
+├── db/
+│   ├── EmployeeDatabase.java   // runtime store, all CRUD logic
+│   └── DatabaseManager.java    // SQL JDBC backup (isolated)
+├── io/
+│   └── FileManager.java        // save/load individual employees
+├── ui/
+│   └── ConsoleMenu.java        // all Scanner/System.out logic
+└── Main.java
+Keeping DatabaseManager completely isolated is key — if the SQL connection fails, the rest of the program never knows.
+
 ## ⚙️ Getting Started
 
 ### Prerequisites
