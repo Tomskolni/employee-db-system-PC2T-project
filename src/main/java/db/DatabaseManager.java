@@ -159,8 +159,9 @@ public class DatabaseManager {
                 int birthYear = rs.getInt(4);
                 String type = rs.getString(5);
                 
-                memDb.addEmployee(name, surname, birthYear, type);
-                loadedEmployees++;
+                if (memDb.addEmployeeWithId(id, name, surname, birthYear, type)) {
+                    loadedEmployees++;
+                }
             }
             rs.close();
             stmt.close();
@@ -176,8 +177,9 @@ public class DatabaseManager {
                 String cooperationLevel = rs.getString(3);
                 
                 CoopLevel level = CoopLevel.valueOf(cooperationLevel);
-                memDb.addCollaboration(employeeId, collaboratorId, level);
-                loadedCollaborations++;
+                if (memDb.addCollaboration(employeeId, collaboratorId, level)) {
+                    loadedCollaborations++;
+                }
             }
             rs.close();
             stmt.close();
