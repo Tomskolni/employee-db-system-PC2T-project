@@ -17,6 +17,14 @@ public class Main {
         }
         System.out.println();
 
+        boolean runIdPreservationTest = true;
+        if (runIdPreservationTest) {
+            System.out.println("Preparing ID test: clearing SQL database");
+            EmployeeDatabase clearDb = new EmployeeDatabase();
+            dbManager.saveAll(clearDb);
+            System.out.println();
+        }
+
         System.out.println("Step 3: Creating in-memory EmployeeDatabase...");
         EmployeeDatabase db = new EmployeeDatabase();
         System.out.println("- EmployeeDatabase created successfully\n");
@@ -24,6 +32,7 @@ public class Main {
         System.out.println("Step 4: Loading previously saved data from SQL...");
         dbManager.loadAll(db);
         int existingEmployees = db.getTotalEmployees();
+        EmployeeDatabase dbToShow = db;
         System.out.println();
 
         if (existingEmployees == 0) {
@@ -52,25 +61,48 @@ public class Main {
 
             System.out.println("Step 7: Saving all data to SQL database...");
             dbManager.saveAll(db);
+
+            System.out.println();
+            System.out.println("Step 8: ID preservation test (delete 1-4, save, reload)...");
+            db.removeEmployee(id1);
+            db.removeEmployee(id2);
+            db.removeEmployee(id3);
+            db.removeEmployee(id4);
+            dbManager.saveAll(db);
+
+            EmployeeDatabase dbReload = new EmployeeDatabase();
+            dbManager.loadAll(dbReload);
+            Employee remaining = dbReload.getEmployee(id5);
+
+            if (remaining != null && dbReload.getTotalEmployees() == 1 && remaining.getId() == id5) {
+                System.out.println("- ID preservation test: PASS (remaining ID " + remaining.getId() + ")");
+            } else {
+                System.out.println("- ID preservation test: FAIL");
+            }
+
+            dbToShow = dbReload;
         } else {
             System.out.println("Step 5: Loaded " + existingEmployees + " employees from previous session");
+            System.out.println("Step 6: Skipping new employee creation (data already loaded)");
+            System.out.println("Step 7: Skipping collaboration creation (data already loaded)");
+            System.out.println("Step 8: Skipping save and ID test (data already loaded)");
         }
         System.out.println();
 
-        System.out.println("Step 8: Current database status...");
-        System.out.println("- Total employees: " + db.getTotalEmployees());
+        System.out.println("Step 9: Current database status...");
+        System.out.println("- Total employees: " + dbToShow.getTotalEmployees());
         System.out.println("- DatabaseManager status: " + (dbManager.isAvailable() ? "ACTIVE" : "INACTIVE"));
         System.out.println();
 
-        System.out.println("Step 9: All employees currently in database:");
-        for (Employee emp : db.getAll()) {
+        System.out.println("Step 10: All employees currently in database:");
+        for (Employee emp : dbToShow.getAll()) {
             String type = emp instanceof DataAnalyst ? "DataAnalyst" : "SecuritySpecialist";
             System.out.println("  [" + emp.getId() + "] " + emp.getName() + " " + emp.getSurname() + 
                              " (born " + emp.getBirthYear() + ") - " + type);
         }
         System.out.println();
 
-        System.out.println("Step 10: Disconnecting from database...");
+        System.out.println("Step 11: Disconnecting from database...");
         dbManager.disconnect();
         System.out.println();
 

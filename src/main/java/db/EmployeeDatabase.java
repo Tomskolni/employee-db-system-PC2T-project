@@ -34,6 +34,30 @@ public class EmployeeDatabase {
         return assignedId;
     }
 
+    public boolean addEmployeeWithId(int id, String name, String surname, int birthYear, String type) {
+        if (id <= 0 || employees.containsKey(id)) {
+            return false;
+        }
+
+        Employee employee;
+
+        if (type.equalsIgnoreCase("DataAnalyst")) {
+            employee = new DataAnalyst(id, name, surname, birthYear);
+        } else if (type.equalsIgnoreCase("SecuritySpecialist")) {
+            employee = new SecuritySpecialist(id, name, surname, birthYear);
+        } else {
+            return false;
+        }
+
+        employees.put(id, employee);
+
+        if (id >= nextId) {
+            nextId = id + 1;
+        }
+
+        return true;
+    }
+
     public boolean removeEmployee(int id) {
         if (!employees.containsKey(id)) {
             return false;
