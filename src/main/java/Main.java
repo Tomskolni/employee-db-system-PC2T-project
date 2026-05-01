@@ -3,130 +3,75 @@ import model.*;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("=== EmployeeDatabase Manual Test ===\n");
+        System.out.println("=== DatabaseManager Test ===\n");
 
+        System.out.println("Step 1: Creating DatabaseManager...");
+        DatabaseManager dbManager = new DatabaseManager();
+        System.out.println();
+
+        System.out.println("Step 2: Checking SQL Availability...");
+        if (dbManager.isAvailable()) {
+            System.out.println("- SQL Database: AVAILABLE (tables created successfully)");
+        } else {
+            System.out.println("- SQL Database: UNAVAILABLE (will run in-memory only)");
+        }
+        System.out.println();
+
+        System.out.println("Step 3: Creating in-memory EmployeeDatabase...");
         EmployeeDatabase db = new EmployeeDatabase();
-        System.out.println("Step 1: Created new EmployeeDatabase\n");
+        System.out.println("- EmployeeDatabase created successfully\n");
 
-        System.out.println("Step 2: Adding 5 employees...");
-        int id1 = db.addEmployee("John", "Doe", 1990, "DataAnalyst");
-        System.out.println("- Added DataAnalyst: John Doe (ID: " + id1 + ")");
-        
-        int id2 = db.addEmployee("Alice", "Johnson", 1992, "DataAnalyst");
-        System.out.println("- Added DataAnalyst: Alice Johnson (ID: " + id2 + ")");
-        
-        int id3 = db.addEmployee("Bob", "Smith", 1988, "SecuritySpecialist");
-        System.out.println("- Added SecuritySpecialist: Bob Smith (ID: " + id3 + ")");
-        
-        int id4 = db.addEmployee("Charlie", "Brown", 1995, "DataAnalyst");
-        System.out.println("- Added DataAnalyst: Charlie Brown (ID: " + id4 + ")");
-        
-        int id5 = db.addEmployee("Diana", "Anderson", 1991, "SecuritySpecialist");
-        System.out.println("- Added SecuritySpecialist: Diana Anderson (ID: " + id5 + ")\n");
-
-        System.out.println("Step 3: Total employees in database: " + db.getTotalEmployees());
-        System.out.println("Employees:");
-        for (Employee emp : db.getAll()) {
-            String role = emp instanceof DataAnalyst ? "DataAnalyst" : "SecuritySpecialist";
-            System.out.println("  - ID: " + emp.getId() + " | Name: " + emp.getName() + " " + emp.getSurname() + " | Role: " + role);
-        }
+        System.out.println("Step 4: Loading previously saved data from SQL...");
+        dbManager.loadAll(db);
+        int existingEmployees = db.getTotalEmployees();
         System.out.println();
 
-        System.out.println("Step 4: Number of DataAnalysts: " + db.countDataAnalysts());
-        System.out.println("Step 4: Number of SecuritySpecialists: " + db.countSecuritySpecialists() + "\n");
+        if (existingEmployees == 0) {
+            System.out.println("Step 5: No previous data found. Adding new employees...");
+            int id1 = db.addEmployee("John", "Doe", 1990, "DataAnalyst");
+            System.out.println("- Added DataAnalyst: John Doe (ID: " + id1 + ")");
+            
+            int id2 = db.addEmployee("Alice", "Johnson", 1992, "DataAnalyst");
+            System.out.println("- Added DataAnalyst: Alice Johnson (ID: " + id2 + ")");
+            
+            int id3 = db.addEmployee("Bob", "Smith", 1988, "SecuritySpecialist");
+            System.out.println("- Added SecuritySpecialist: Bob Smith (ID: " + id3 + ")");
+            
+            int id4 = db.addEmployee("Charlie", "Brown", 1995, "DataAnalyst");
+            System.out.println("- Added DataAnalyst: Charlie Brown (ID: " + id4 + ")");
+            
+            int id5 = db.addEmployee("Diana", "Anderson", 1991, "SecuritySpecialist");
+            System.out.println("- Added SecuritySpecialist: Diana Anderson (ID: " + id5 + ")\n");
 
-        System.out.println("Step 5: Adding multiple collaborations...");
-        db.addCollaboration(id1, id2, CoopLevel.GOOD);
-        System.out.println("- John collaborates with Alice (GOOD)");
-        
-        db.addCollaboration(id1, id3, CoopLevel.AVERAGE);
-        System.out.println("- John collaborates with Bob (AVERAGE)");
-        
-        db.addCollaboration(id2, id3, CoopLevel.GOOD);
-        System.out.println("- Alice collaborates with Bob (GOOD)");
-        
-        db.addCollaboration(id4, id1, CoopLevel.GOOD);
-        System.out.println("- Charlie collaborates with John (GOOD)");
-        
-        db.addCollaboration(id5, id2, CoopLevel.POOR);
-        System.out.println("- Diana collaborates with Alice (POOR)\n");
+            System.out.println("Step 6: Adding collaborations...");
+            db.addCollaboration(id1, id2, CoopLevel.GOOD);
+            db.addCollaboration(id1, id3, CoopLevel.AVERAGE);
+            db.addCollaboration(id2, id3, CoopLevel.GOOD);
+            System.out.println("- Added 3 collaborations");
+            System.out.println();
 
-        System.out.println("Step 5b: Testing addCollaboration validation...");
-        boolean invalidCollab1 = db.addCollaboration(id1, 999, CoopLevel.GOOD);
-        System.out.println("- Try to add collaboration with non-existent employee (999): " + (invalidCollab1 ? "FAILED" : "CORRECTLY REJECTED"));
-        
-        boolean invalidCollab2 = db.addCollaboration(999, id1, CoopLevel.GOOD);
-        System.out.println("- Try to add collaboration with non-existent employee (999): " + (invalidCollab2 ? "FAILED" : "CORRECTLY REJECTED"));
-        
-        boolean validCollab = db.addCollaboration(id3, id4, CoopLevel.AVERAGE);
-        System.out.println("- Add valid collaboration (Bob-Charlie): " + (validCollab ? "SUCCESS" : "FAILED"));
-        System.out.println();
-
-        System.out.println("Step 5c: Displaying collaborations to verify they were added...");
-        System.out.println("John's collaborators:");
-        Employee john = db.getEmployee(id1);
-        for (Collaborator collab : john.getCollaborators()) {
-            System.out.println("  - " + collab.getEmployee().getName() + " " + collab.getEmployee().getSurname() + " (" + collab.getLevel() + ")");
-        }
-        
-        System.out.println("Bob's collaborators:");
-        Employee bob = db.getEmployee(id3);
-        for (Collaborator collab : bob.getCollaborators()) {
-            System.out.println("  - " + collab.getEmployee().getName() + " " + collab.getEmployee().getSurname() + " (" + collab.getLevel() + ")");
-        }
-        
-        System.out.println("Charlie's collaborators:");
-        Employee charlie = db.getEmployee(id4);
-        for (Collaborator collab : charlie.getCollaborators()) {
-            System.out.println("  - " + collab.getEmployee().getName() + " " + collab.getEmployee().getSurname() + " (" + collab.getLevel() + ")");
-        }
-        System.out.println();
-
-        System.out.println("Step 6: Employees sorted by surname (alphabetically):");
-        for (Employee emp : db.getAllSortedBySurname()) {
-            System.out.println("  - " + emp.getSurname() + ", " + emp.getName() + " (ID: " + emp.getId() + ")");
-        }
-        System.out.println();
-
-        System.out.println("Step 7: DataAnalysts sorted by surname:");
-        for (Employee emp : db.getDataAnalystsSortedBySurname()) {
-            System.out.println("  - " + emp.getSurname() + ", " + emp.getName() + " (ID: " + emp.getId() + ")");
-        }
-        System.out.println();
-
-        System.out.println("Step 8: SecuritySpecialists sorted by surname:");
-        for (Employee emp : db.getSecuritySpecialistsSortedBySurname()) {
-            System.out.println("  - " + emp.getSurname() + ", " + emp.getName() + " (ID: " + emp.getId() + ")");
-        }
-        System.out.println();
-
-        System.out.println("Step 9: Statistics");
-        Employee mostConnected = db.getEmployeeWithMostConnections();
-        if (mostConnected != null) {
-            System.out.println("- Employee with most connections: " + mostConnected.getName() + " " + mostConnected.getSurname() 
-                + " (ID: " + mostConnected.getId() + ") with " + db.getCountMostConnections() + " connections");
+            System.out.println("Step 7: Saving all data to SQL database...");
+            dbManager.saveAll(db);
         } else {
-            System.out.println("- No employees with connections");
-        }
-        
-        CoopLevel prevailing = db.getPrevailingCooperationQuality();
-        if (prevailing != null) {
-            System.out.println("- Prevailing cooperation quality: " + prevailing);
-        } else {
-            System.out.println("- No cooperation data available");
+            System.out.println("Step 5: Loaded " + existingEmployees + " employees from previous session");
         }
         System.out.println();
 
-        System.out.println("Step 10: Removing employee ID 1 (John Doe)...");
-        boolean removed = db.removeEmployee(id1);
-        System.out.println("- Employee removed: " + (removed ? "SUCCESS" : "FAILED") + "\n");
+        System.out.println("Step 8: Current database status...");
+        System.out.println("- Total employees: " + db.getTotalEmployees());
+        System.out.println("- DatabaseManager status: " + (dbManager.isAvailable() ? "ACTIVE" : "INACTIVE"));
+        System.out.println();
 
-        System.out.println("Step 11: Total employees after deletion: " + db.getTotalEmployees());
-        System.out.println("Remaining employees:");
+        System.out.println("Step 9: All employees currently in database:");
         for (Employee emp : db.getAll()) {
-            String role = emp instanceof DataAnalyst ? "DataAnalyst" : "SecuritySpecialist";
-            System.out.println("  - ID: " + emp.getId() + " | Name: " + emp.getName() + " " + emp.getSurname() + " | Role: " + role);
+            String type = emp instanceof DataAnalyst ? "DataAnalyst" : "SecuritySpecialist";
+            System.out.println("  [" + emp.getId() + "] " + emp.getName() + " " + emp.getSurname() + 
+                             " (born " + emp.getBirthYear() + ") - " + type);
         }
+        System.out.println();
+
+        System.out.println("Step 10: Disconnecting from database...");
+        dbManager.disconnect();
         System.out.println();
 
         System.out.println("=== Test Complete ===");
