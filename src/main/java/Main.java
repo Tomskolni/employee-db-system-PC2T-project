@@ -51,6 +51,37 @@ public class Main {
         db.addCollaboration(id5, id2, CoopLevel.POOR);
         System.out.println("- Diana collaborates with Alice (POOR)\n");
 
+        System.out.println("Step 5b: Testing addCollaboration validation...");
+        boolean invalidCollab1 = db.addCollaboration(id1, 999, CoopLevel.GOOD);
+        System.out.println("- Try to add collaboration with non-existent employee (999): " + (invalidCollab1 ? "FAILED" : "CORRECTLY REJECTED"));
+        
+        boolean invalidCollab2 = db.addCollaboration(999, id1, CoopLevel.GOOD);
+        System.out.println("- Try to add collaboration with non-existent employee (999): " + (invalidCollab2 ? "FAILED" : "CORRECTLY REJECTED"));
+        
+        boolean validCollab = db.addCollaboration(id3, id4, CoopLevel.AVERAGE);
+        System.out.println("- Add valid collaboration (Bob-Charlie): " + (validCollab ? "SUCCESS" : "FAILED"));
+        System.out.println();
+
+        System.out.println("Step 5c: Displaying collaborations to verify they were added...");
+        System.out.println("John's collaborators:");
+        Employee john = db.getEmployee(id1);
+        for (Collaborator collab : john.getCollaborators()) {
+            System.out.println("  - " + collab.getEmployee().getName() + " " + collab.getEmployee().getSurname() + " (" + collab.getLevel() + ")");
+        }
+        
+        System.out.println("Bob's collaborators:");
+        Employee bob = db.getEmployee(id3);
+        for (Collaborator collab : bob.getCollaborators()) {
+            System.out.println("  - " + collab.getEmployee().getName() + " " + collab.getEmployee().getSurname() + " (" + collab.getLevel() + ")");
+        }
+        
+        System.out.println("Charlie's collaborators:");
+        Employee charlie = db.getEmployee(id4);
+        for (Collaborator collab : charlie.getCollaborators()) {
+            System.out.println("  - " + collab.getEmployee().getName() + " " + collab.getEmployee().getSurname() + " (" + collab.getLevel() + ")");
+        }
+        System.out.println();
+
         System.out.println("Step 6: Employees sorted by surname (alphabetically):");
         for (Employee emp : db.getAllSortedBySurname()) {
             System.out.println("  - " + emp.getSurname() + ", " + emp.getName() + " (ID: " + emp.getId() + ")");
