@@ -2,6 +2,8 @@ package db;
 
 import model.*;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -123,5 +125,101 @@ public class EmployeeDatabase {
 
     public boolean employeeExists(int id) {
         return employees.containsKey(id);
+    }
+
+    public List<Employee> getAllSortedBySurname() {
+        List<Employee> sorted = new ArrayList<>(employees.values());
+        
+        Collections.sort(sorted, new Comparator<Employee>() {
+            public int compare(Employee e1, Employee e2) {
+                return e1.getSurname().compareTo(e2.getSurname());
+            }
+        });
+        
+        return sorted;
+    }
+
+    public List<Employee> getDataAnalystsSortedBySurname() {
+        List<Employee> analysts = getAllDataAnalysts();
+        
+        Collections.sort(analysts, new Comparator<Employee>() {
+            public int compare(Employee e1, Employee e2) {
+                return e1.getSurname().compareTo(e2.getSurname());
+            }
+        });
+        
+        return analysts;
+    }
+
+    public List<Employee> getSecuritySpecialistsSortedBySurname() {
+        List<Employee> specialists = getAllSecuritySpecialists();
+        
+        Collections.sort(specialists, new Comparator<Employee>() {
+            public int compare(Employee e1, Employee e2) {
+                return e1.getSurname().compareTo(e2.getSurname());
+            }
+        });
+        
+        return specialists;
+    }
+
+    public Employee getEmployeeWithMostConnections() {
+        if (employees.isEmpty()) {
+            return null;
+        }
+        
+        Employee mostConnected = null;
+        int maxConnections = -1;
+        
+        for (Employee employee : employees.values()) {
+            int connectionCount = employee.getCollaborators().size();
+            
+            if (connectionCount > maxConnections) {
+                maxConnections = connectionCount;
+                mostConnected = employee;
+            }
+        }
+        
+        return mostConnected;
+    }
+
+    public int getCountMostConnections() {
+        Employee mostConnected = getEmployeeWithMostConnections();
+        
+        if (mostConnected == null) {
+            return 0;
+        }
+        
+        return mostConnected.getCollaborators().size();
+    }
+
+    public CoopLevel getPrevailingCooperationQuality() {
+        int poorCount = 0;
+        int averageCount = 0;
+        int goodCount = 0;
+        
+        for (Employee employee : employees.values()) {
+            for (Collaborator collab : employee.getCollaborators()) {
+                if (collab.getLevel() == CoopLevel.POOR) {
+                    poorCount++;
+                } else if (collab.getLevel() == CoopLevel.AVERAGE) {
+                    averageCount++;
+                } else if (collab.getLevel() == CoopLevel.GOOD) {
+                    goodCount++;
+                }
+            }
+        }
+        
+        if (poorCount == 0 && averageCount == 0 && goodCount == 0) {
+            return null;
+        }
+        
+        if (goodCount >= averageCount && goodCount >= poorCount) {
+            return CoopLevel.GOOD;
+        } else if (averageCount >= poorCount) {
+            return CoopLevel.AVERAGE;
+        } else {
+            return CoopLevel.POOR;
+        }
     }
 }
