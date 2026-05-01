@@ -1,44 +1,49 @@
+import db.*;
 import model.*;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("=== Employee Database System - Manual Test ===\n");
+        System.out.println("=== EmployeeDatabase Manual Test ===\n");
 
-        Employee analyst1 = new DataAnalyst(1, "John", "Doe", 1990);
-        Employee analyst2 = new DataAnalyst(2, "Alice", "Johnson", 1992);
-        Employee specialist = new SecuritySpecialist(3, "Bob", "Smith", 1988);
+        EmployeeDatabase db = new EmployeeDatabase();
+        System.out.println("Step 1: Created new EmployeeDatabase\n");
 
-        System.out.println("Created 3 employees:");
-        System.out.println("- " + analyst1.getName() + " " + analyst1.getSurname() + " (ID: " + analyst1.getId() + ") - DataAnalyst");
-        System.out.println("- " + analyst2.getName() + " " + analyst2.getSurname() + " (ID: " + analyst2.getId() + ") - DataAnalyst");
-        System.out.println("- " + specialist.getName() + " " + specialist.getSurname() + " (ID: " + specialist.getId() + ") - SecuritySpecialist");
-        System.out.println();
-
-        Collaborator collab1 = new Collaborator(analyst2, CoopLevel.GOOD);
-        Collaborator collab2 = new Collaborator(specialist, CoopLevel.AVERAGE);
-        Collaborator collab3 = new Collaborator(analyst1, CoopLevel.GOOD);
-        Collaborator collab4 = new Collaborator(specialist, CoopLevel.GOOD);
-        Collaborator collab5 = new Collaborator(analyst1, CoopLevel.AVERAGE);
-
-        analyst1.addCollaborator(collab1);
-        analyst1.addCollaborator(collab2);
-        analyst2.addCollaborator(collab3);
-        analyst2.addCollaborator(collab4);
-        specialist.addCollaborator(collab5);
-
-        System.out.println("Added collaborations:");
-        System.out.println("- John works with Alice (GOOD) and Bob (AVERAGE)");
-        System.out.println("- Alice works with John (GOOD) and Bob (GOOD)");
-        System.out.println("- Bob works with John (AVERAGE)");
-        System.out.println();
-
-        System.out.println("=== Testing Polymorphic Skills ===\n");
-
-        analyst1.executeSkill();
-        System.out.println();
+        System.out.println("Step 2: Adding 3 employees...");
+        int id1 = db.addEmployee("John", "Doe", 1990, "DataAnalyst");
+        System.out.println("- Added DataAnalyst: John Doe (ID: " + id1 + ")");
         
-        specialist.executeSkill();
+        int id2 = db.addEmployee("Alice", "Johnson", 1992, "DataAnalyst");
+        System.out.println("- Added DataAnalyst: Alice Johnson (ID: " + id2 + ")");
+        
+        int id3 = db.addEmployee("Bob", "Smith", 1988, "SecuritySpecialist");
+        System.out.println("- Added SecuritySpecialist: Bob Smith (ID: " + id3 + ")\n");
+
+        System.out.println("Step 3: Total employees in database: " + db.getTotalEmployees());
+        System.out.println("Employees:");
+        for (Employee emp : db.getAll()) {
+            String role = emp instanceof DataAnalyst ? "DataAnalyst" : "SecuritySpecialist";
+            System.out.println("  - ID: " + emp.getId() + " | Name: " + emp.getName() + " " + emp.getSurname() + " | Role: " + role);
+        }
         System.out.println();
+
+        System.out.println("Step 4: Number of DataAnalysts: " + db.countDataAnalysts());
+        System.out.println("Step 4: Number of SecuritySpecialists: " + db.countSecuritySpecialists() + "\n");
+
+        System.out.println("Step 5: Adding collaboration between John (ID 1) and Alice (ID 2)...");
+        boolean collabAdded = db.addCollaboration(id1, id2, CoopLevel.GOOD);
+        System.out.println("- Collaboration added: " + (collabAdded ? "SUCCESS" : "FAILED") + "\n");
+
+        System.out.println("Step 6: Removing employee ID 1 (John Doe)...");
+        boolean removed = db.removeEmployee(id1);
+        System.out.println("- Employee removed: " + (removed ? "SUCCESS" : "FAILED") + "\n");
+
+        System.out.println("Step 7: Total employees after deletion: " + db.getTotalEmployees());
+        System.out.println("Remaining employees:");
+        for (Employee emp : db.getAll()) {
+            String role = emp instanceof DataAnalyst ? "DataAnalyst" : "SecuritySpecialist";
+            System.out.println("  - ID: " + emp.getId() + " | Name: " + emp.getName() + " " + emp.getSurname() + " | Role: " + role);
+        }
+        System.out.println("Step 7: Number of DataAnalysts after deletion: " + db.countDataAnalysts() + "\n");
 
         System.out.println("=== Test Complete ===");
     }
