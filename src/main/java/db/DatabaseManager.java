@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class DatabaseManager {
@@ -136,6 +137,57 @@ public class DatabaseManager {
             }
         } finally {
             pstmt.close();
+        }
+    }
+
+    public void loadAll(EmployeeDatabase memDb) {
+        if (!isAvailable) {
+            System.out.println("DatabaseManager: SQL not available, cannot load");
+            return;
+        }
+
+        try {
+            String selectEmployeesSQL = "SELECT id, name, surname, birthYear, type FROM employees ORDER BY id";
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(selectEmployeesSQL);
+            
+            int loadedEmployees = 0;
+            while (rs.next()) {
+                int id = rs.getInt(1);
+                String name = rs.getString(2);
+                String surname = rs.getString(3);
+                int birthYear = rs.getInt(4);
+                String type = rs.getString(5);
+                
+                memDb.addEmployee(name, surname, birthYear, type);
+                loadedEmployees++;
+            }
+            rs.close();
+            stmt.close();
+            
+            String selectCollaborationsSQL = "SELECT employeeId, collaboratorId, cooperationLevel FROM collaborations";
+            stmt = connection.createStatement();
+            rs = stmt.executeQuery(selectCollaborationsSQL);
+            
+            int loadedCollaborations = 0;
+            while (rs.next()) {
+                int employeeId = rs.getInt(1);
+                int collaboratorId = rs.getInt(2);
+                String cooperationLevel = rs.getString(3);
+                
+                CoopLevel level = CoopLevel.valueOf(cooperationLevel);
+                memDb.addCollaboration(employeeId, collaboratorId, level);
+                loadedCollaborations++;
+            }
+            rs.close();
+            stmt.close();
+            
+            System.out.println("DatabaseManager: All data loaded from SQL database successfully");
+            System.out.println("  - Loaded " + loadedEmployees + " employees");
+            System.out.println("  - Loaded " + loadedCollaborations + " collaborations");
+        } catch (SQLException e) {
+            System.out.println("DatabaseManager ERROR: Failed to load data from SQL database");
+            System.out.println("  Reason: " + e.getMessage());
         }
     }
 
