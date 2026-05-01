@@ -41,7 +41,22 @@ public class Main {
         System.out.println("Step 6: DatabaseManager status: " + (dbManager.isAvailable() ? "ACTIVE" : "INACTIVE"));
         System.out.println();
 
-        System.out.println("Step 7: Disconnecting from database...");
+        System.out.println("Step 7: Adding collaborations...");
+        db.addCollaboration(id1, id2, CoopLevel.GOOD);
+        db.addCollaboration(id1, id3, CoopLevel.AVERAGE);
+        db.addCollaboration(id2, id3, CoopLevel.GOOD);
+        System.out.println("- Added 3 collaborations");
+        System.out.println();
+
+        System.out.println("Step 8: Saving all data to SQL database...");
+        dbManager.saveAll(db);
+        System.out.println();
+
+        System.out.println("Step 9: Verifying saved data...");
+        dbManager.verifySavedData();
+        System.out.println();
+
+        System.out.println("Step 10: Disconnecting from database...");
         dbManager.disconnect();
         System.out.println();
 
