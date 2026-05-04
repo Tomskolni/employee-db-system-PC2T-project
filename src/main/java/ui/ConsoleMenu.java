@@ -2,6 +2,7 @@ package ui;
 
 import db.DatabaseManager;
 import db.EmployeeDatabase;
+import model.CoopLevel;
 import model.Employee;
 
 import java.util.InputMismatchException;
@@ -35,7 +36,7 @@ public class ConsoleMenu {
                     handleAddEmployee(scanner);
                     break;
                 case 2:
-                    System.out.println("TODO: Add collaboration (b)");
+                    handleAddCollaboration(scanner);
                     break;
                 case 3:
                     handleRemoveEmployee(scanner);
@@ -44,13 +45,13 @@ public class ConsoleMenu {
                     handleFindEmployeeById(scanner);
                     break;
                 case 5:
-                    System.out.println("TODO: Execute employee skill (e)");
+                    handleExecuteSkill(scanner);
                     break;
                 case 6:
                     printEmployeesBySurnameInGroups();
                     break;
                 case 7:
-                    System.out.println("TODO: Statistics - prevailing quality and most connected (g)");
+                    printStatistics();
                     break;
                 case 8:
                     printCountsByGroup();
@@ -143,6 +144,78 @@ public class ConsoleMenu {
         printEmployeeDetails(employee);
     }
 
+    private void handleAddCollaboration(Scanner scanner) {
+        Integer employeeId = readIntInput(scanner, "Enter employee ID: ");
+        if (employeeId == null) {
+            return;
+        }
+
+        Integer collaboratorId = readIntInput(scanner, "Enter collaborator ID: ");
+        if (collaboratorId == null) {
+            return;
+        }
+
+        if (employeeId.equals(collaboratorId)) {
+            System.out.println("Warning: Employee cannot collaborate with themselves.");
+            return;
+        }
+
+        CoopLevel level = promptCoopLevel(scanner);
+        if (level == null) {
+            System.out.println("Warning: Invalid cooperation level. Use POOR, AVERAGE, or GOOD.");
+            return;
+        }
+
+        boolean added = db.addCollaboration(employeeId, collaboratorId, level);
+        if (added) {
+            System.out.println("Collaboration added: " + employeeId + " -> " + collaboratorId + " (" + level + ")");
+        } else {
+            System.out.println("Warning: Could not add collaboration. Check that both IDs exist.");
+        }
+    }
+
+    private void handleExecuteSkill(Scanner scanner) {
+        Integer employeeId = readIntInput(scanner, "Enter employee ID to execute skill: ");
+        if (employeeId == null) {
+            return;
+        }
+
+        Employee employee = db.getEmployee(employeeId);
+        if (employee == null) {
+            System.out.println("Employee not found.");
+            return;
+        }
+
+        System.out.println("Executing skill for " + employee.getName() + " " + employee.getSurname() + "...");
+        employee.executeSkill();
+    }
+
+    private void printStatistics() {
+        CoopLevel prevailing = db.getPrevailingCooperationQuality();
+        Employee mostConnected = db.getEmployeeWithMostConnections();
+
+        System.out.println("========== Statistics ==========");
+
+        if (prevailing == null) {
+            System.out.println("Prevailing cooperation quality: no collaborations recorded yet");
+        } else {
+            System.out.println("Prevailing cooperation quality: " + prevailing);
+        }
+
+        if (mostConnected == null) {
+            System.out.println("Most connected employee: no employees in database");
+        } else {
+            System.out.println(
+                "Most connected employee: "
+                    + mostConnected.getName() + " " + mostConnected.getSurname()
+                    + " [ID=" + mostConnected.getId() + "]"
+            );
+            System.out.println("Number of collaborations: " + mostConnected.getCollaborators().size());
+        }
+
+        System.out.println("================================");
+    }
+
     private void printEmployeesBySurnameInGroups() {
         List<Employee> analysts = db.getDataAnalystsSortedBySurname();
         List<Employee> specialists = db.getSecuritySpecialistsSortedBySurname();
@@ -203,6 +276,17 @@ public class ConsoleMenu {
         }
 
         return null;
+    }
+
+    private CoopLevel promptCoopLevel(Scanner scanner) {
+        System.out.print("Enter cooperation level (POOR/AVERAGE/GOOD): ");
+        String input = scanner.nextLine().trim().toUpperCase();
+
+        try {
+            return CoopLevel.valueOf(input);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     private void printEmployeeDetails(Employee employee) {
