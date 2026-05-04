@@ -34,6 +34,20 @@ public class EmployeeDatabase {
         return assignedId;
     }
 
+    public boolean addEmployee(Employee employee) {
+        if (employee == null || employees.containsKey(employee.getId())) {
+            return false;
+        }
+
+        employees.put(employee.getId(), employee);
+
+        if (employee.getId() >= nextId) {
+            nextId = employee.getId() + 1;
+        }
+
+        return true;
+    }
+
     public boolean addEmployeeWithId(int id, String name, String surname, int birthYear, String type) {
         if (id <= 0 || employees.containsKey(id)) {
             return false;

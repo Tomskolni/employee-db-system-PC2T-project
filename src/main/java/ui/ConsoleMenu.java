@@ -2,6 +2,7 @@ package ui;
 
 import db.DatabaseManager;
 import db.EmployeeDatabase;
+import io.FileManager;
 import model.CoopLevel;
 import model.Employee;
 
@@ -57,16 +58,18 @@ public class ConsoleMenu {
                     printCountsByGroup();
                     break;
                 case 9:
-                    System.out.println("TODO: Save employee to file (i)");
+                    handleSaveEmployeeToFile(scanner);
                     break;
                 case 10:
-                    System.out.println("TODO: Load employee from file (j)");
+                    handleLoadEmployeeFromFile(scanner);
                     break;
                 case 11:
-                    System.out.println("TODO: Save all to SQL now (k)");
+                    dbManager.saveAll(db);
+                    System.out.println("All data saved to SQL database.");
                     break;
                 case 12:
-                    System.out.println("TODO: Load all from SQL now (l)");
+                    dbManager.loadAll(db);
+                    System.out.println("All data loaded from SQL database.");
                     break;
                 case 13:
                     System.out.println("Exiting: saving data to SQL...");
@@ -214,6 +217,50 @@ public class ConsoleMenu {
         }
 
         System.out.println("================================");
+    }
+
+    private void handleSaveEmployeeToFile(Scanner scanner) {
+        Integer employeeId = readIntInput(scanner, "Enter employee ID to save: ");
+        if (employeeId == null) {
+            return;
+        }
+
+        System.out.print("Enter filename: ");
+        String filename = scanner.nextLine().trim();
+        if (filename.isEmpty()) {
+            System.out.println("Warning: Filename cannot be empty.");
+            return;
+        }
+
+        Employee employee = db.getEmployee(employeeId);
+        if (employee == null) {
+            System.out.println("Warning: Employee with this ID was not found.");
+            return;
+        }
+
+        FileManager.saveEmployee(employee, filename);
+    }
+
+    private void handleLoadEmployeeFromFile(Scanner scanner) {
+        System.out.print("Enter filename: ");
+        String filename = scanner.nextLine().trim();
+        if (filename.isEmpty()) {
+            System.out.println("Warning: Filename cannot be empty.");
+            return;
+        }
+
+        Employee loadedEmployee = FileManager.loadEmployee(filename);
+        if (loadedEmployee == null) {
+            System.out.println("Warning: Employee could not be loaded from file.");
+            return;
+        }
+
+        boolean added = db.addEmployee(loadedEmployee);
+        if (added) {
+            System.out.println("Employee loaded into database with ID: " + loadedEmployee.getId());
+        } else {
+            System.out.println("Warning: Employee could not be added to database. ID may already exist.");
+        }
     }
 
     private void printEmployeesBySurnameInGroups() {
