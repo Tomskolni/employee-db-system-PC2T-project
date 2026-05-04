@@ -45,23 +45,25 @@ src/
 │   └── FileManager.java        // save/load individual employees
 ├── ui/
 │   └── ConsoleMenu.java        // all Scanner/System.out logic
-└── Main.java.
+└── Main.java
 ```
 ## ⚙️ Getting Started
 
 ### Prerequisites
 * Java Development Kit (JDK) 21 or higher.
-* An SQL Database (e.g., MySQL, SQLite, or PostgreSQL) running locally for the backup feature.
-* JDBC Driver for your chosen SQL database.
+* Apache Maven (for dependency management and building).
 
 ### Setup Instructions
 1.  Clone the repository:
     ```bash
-    git clone [https://github.com/Tomskolni/employee-db-system-PC2T-project.git](https://github.com/Tomskolni/employee-db-system-PC2T-project.git)
+    git clone https://github.com/Tomskolni/employee-db-system-PC2T-project.git
     ```
-2.  Open the project in your preferred IDE (e.g., VS Code, IntelliJ IDEA).
-3.  Configure your SQL database connection details in the `DatabaseConnection` class (or `.properties` file).
-4.  Compile and run the main application.
+2.  Open the project in your preferred IDE (e.g., VS Code, IntelliJ IDEA, Eclipse).
+3.  Because the project uses Maven and embedded SQLite, the database driver is downloaded automatically via `pom.xml`, and the database file (`employee_database.db`) is generated locally. No external database server setup is required!
+4.  Run the application directly through your IDE or use Maven in the terminal:
+    ```bash
+    mvn clean compile exec:java
+    ```
 
 ## 👥 Authors
 
